@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import StatCard from '../components/StatCard';
 import ExpenseChart from '../components/ExpenseChart';
+import TransactionRow from '../components/TransactionRow';
+import AddTransactionModal from '../components/AddTransactionModal';
 // Placeholder imports for future components
-// import TransactionRow from '../components/TransactionRow';
 // import AddTransactionModal from '../components/AddTransactionModal';
 
 function Dashboard() {
@@ -15,37 +16,40 @@ function Dashboard() {
   const [showModal, setShowModal] = useState(false);
   const token = localStorage.getItem('token');
 
+  // Refactored data fetching for reuse
+  const fetchDashboardData = async () => {
+    if (!token) {
+      setError('Not authenticated');
+      setLoading(false);
+      return;
+    }
+    try {
+      setLoading(true);
+      // Fetch user info
+      const userRes = await axios.get('/api/auth/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUser(userRes.data);
+      // Fetch summary
+      const summaryRes = await axios.get('/api/transactions/summary', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setSummary(summaryRes.data);
+      // Fetch transactions
+      const txRes = await axios.get('/api/transactions', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTransactions(txRes.data);
+    } catch (err) {
+      setError('Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      if (!token) {
-        setError('Not authenticated');
-        setLoading(false);
-        return;
-      }
-      try {
-        setLoading(true);
-        // Fetch user info
-        const userRes = await axios.get('/api/auth/me', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUser(userRes.data);
-        // Fetch summary
-        const summaryRes = await axios.get('/api/transactions/summary', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setSummary(summaryRes.data);
-        // Fetch transactions
-        const txRes = await axios.get('/api/transactions', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setTransactions(txRes.data);
-      } catch (err) {
-        setError('Failed to load dashboard data');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+    fetchDashboardData();
+    // eslint-disable-next-line
   }, [token]);
 
   if (loading) return <div className="flex justify-center items-center min-h-[40vh]"><div className="text-primary animate-pulse text-lg font-semibold">Loading dashboard...</div></div>;
@@ -97,38 +101,19 @@ function Dashboard() {
             <div className="text-on-surface-secondary text-center">No transactions yet. Add your first one!</div>
           ) : (
             <div className="space-y-2">
-              {/* {transactions.map(tx => <TransactionRow key={tx._id} tx={tx} />)} */}
               {transactions.slice(0, 6).map(tx => (
-                <div
-                  key={tx._id}
-                  className={`bg-surface rounded-lg shadow p-4 flex flex-col sm:flex-row sm:items-center justify-between border-l-4 mb-2 ${tx.type === 'Income' ? 'border-green-400' : 'border-red-400'}`}
-                >
-                  <div className="flex items-center gap-3">
-                    {/* <CategoryIcon category={tx.category} /> */}
-                    <span className="font-bold text-on-surface">{tx.title}</span>
-                  </div>
-                  <div className="flex items-center gap-4 mt-2 sm:mt-0">
-                    <span className={tx.type === 'Income' ? 'text-green-400' : 'text-red-400'}>
-                      {tx.type === 'Income' ? '+' : '-'}₹{tx.amount}
-                    </span>
-                    <span className="text-on-surface-secondary text-sm">{new Date(tx.date).toLocaleDateString('en-GB')}</span>
-                    <span className="text-on-surface-secondary text-sm">{tx.category}</span>
-                  </div>
-                </div>
+                <TransactionRow key={tx._id} tx={tx} />
               ))}
             </div>
           )}
         </div>
       </div>
       {/* Add Transaction Modal */}
-      {/* {showModal && <AddTransactionModal onClose={() => setShowModal(false)} onAdd={...} />} */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 shadow-lg min-w-[320px]">
-            <div className="text-lg font-bold mb-4">[AddTransactionModal coming soon]</div>
-            <button className="mt-4 px-4 py-2 bg-primary text-white rounded" onClick={() => setShowModal(false)}>Close</button>
-          </div>
-        </div>
+        <AddTransactionModal
+          onClose={() => setShowModal(false)}
+          onAdd={fetchDashboardData}
+        />
       )}
     </div>
   );
