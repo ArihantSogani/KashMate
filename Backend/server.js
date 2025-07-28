@@ -18,18 +18,19 @@ app.use((req, res, next) => {
 const transactionRoutes = require('./routes/transactionRoutes');
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/reviews', require('./routes/reviewRoutes'));
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URI, {
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/money-manager';
+console.log('MongoDB URI:', MONGO_URI ? 'Configured' : 'Not configured');
+
+mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
+.then(() => console.log('MongoDB connected successfully'))
+.catch(err => console.log('MongoDB connection error:', err));
 
-console.log('MongoDB URI:', process.env.MONGO_URI ? 'Configured' : 'Not Configured');
-
-// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

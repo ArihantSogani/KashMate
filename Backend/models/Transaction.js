@@ -18,6 +18,11 @@ const transactionSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  paymentMode: {
+  type: String,
+  enum: ['Cash', 'Card', 'UPI'],
+  required: true
+  },
   type: {
     type: String,
     enum: ['Income', 'Expense'],

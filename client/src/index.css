@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+  background: #232B39; /* dark surface */
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #2dd4bf; /* primary accent (teal) */
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #14b8a6; /* darker accent on hover */
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2dd4bf #232B39;
+}

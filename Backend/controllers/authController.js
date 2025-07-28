@@ -8,11 +8,22 @@ exports.registerUser = async (req, res) => {
   console.log('Request body:', req.body);
   const { name, email, password } = req.body;
 
+  // Validate input
+  if (!name || !email || !password) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+
   try {
     // Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
       console.log('User already exists:', email);
+      console.log('Existing user details:', { 
+        id: userExists._id, 
+        name: userExists.name, 
+        hasPassword: !!userExists.password,
+        passwordLength: userExists.password ? userExists.password.length : 0
+      });
       return res.status(400).json({ message: 'User already exists' });
     }
 
@@ -40,7 +51,18 @@ exports.registerUser = async (req, res) => {
     res.status(201).json({ token });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ message: 'Server error' });
+    
+    // Provide more specific error messages
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+    
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ message: messages.join(', ') });
+    }
+    
+    res.status(500).json({ message: 'Server error. Please try again later.' });
   }
 };
 
@@ -48,11 +70,26 @@ exports.registerUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
 
+  // Validate input
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required' });
+  }
+
   try {
     // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    // Check if user has a valid password
+    if (!user.password || user.password.length < 10) {
+      console.log('User found but password is invalid:', { 
+        email, 
+        hasPassword: !!user.password,
+        passwordLength: user.password ? user.password.length : 0
+      });
+      return res.status(400).json({ message: 'Account corrupted. Please contact support or try registering again.' });
     }
 
     // Compare password
@@ -70,7 +107,8 @@ exports.loginUser = async (req, res) => {
 
     res.status(200).json({ token });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Server error. Please try again later.' });
   }
 };
 
@@ -84,5 +122,95 @@ exports.getMe = async (req, res) => {
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch user info', error });
+  }
+};
+
+// Update user profile (name and email)
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    
+    // Validate input
+    if (!name || !email) {
+      return res.status(400).json({ message: 'Name and email are required' });
+    }
+
+    // Check if email is already taken by another user
+    const existingUser = await User.findOne({ email, _id: { $ne: req.user.id } });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email is already taken' });
+    }
+
+    // Update user
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { name, email },
+      { new: true, runValidators: true }
+    ).select('name email');
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(updatedUser);
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ message: 'Failed to update profile' });
+  }
+};
+
+// Update user password
+exports.updatePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    
+    // Validate input
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'Current password and new password are required' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'New password must be at least 6 characters long' });
+    }
+
+    // Get user with password
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Verify current password
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isCurrentPasswordValid) {
+      return res.status(400).json({ message: 'Current password is incorrect' });
+    }
+
+    // Hash new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password
+    user.password = hashedNewPassword;
+    await user.save();
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Update password error:', error);
+    res.status(500).json({ message: 'Failed to update password' });
+  }
+};
+
+// Utility function to delete user by email (for debugging)
+exports.deleteUserByEmail = async (req, res) => {
+  const { email } = req.params;
+  
+  try {
+    const user = await User.findOneAndDelete({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Delete user error:', error);
+    res.status(500).json({ message: 'Failed to delete user' });
   }
 };

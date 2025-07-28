@@ -9,6 +9,7 @@ function AddTransactionModal({ onClose, onAdd }) {
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
+  const [paymentMode, setPaymentMode] = useState('');
   const [type, setType] = useState('Expense');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -29,6 +30,7 @@ function AddTransactionModal({ onClose, onAdd }) {
         amount: Number(amount),
         category: formattedCategory,
         type,
+        paymentMode,
       }, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -43,27 +45,32 @@ function AddTransactionModal({ onClose, onAdd }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-8 shadow-lg min-w-[320px] w-full max-w-sm relative text-gray-800">
-        <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-600" onClick={onClose}>&times;</button>
-        <h2 className="text-xl font-bold mb-4 text-gray-800">Add Transaction</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="bg-[#19202A] rounded-2xl shadow-2xl p-8 min-w-[340px] w-full max-w-md relative">
+        <button
+          className="absolute top-3 right-4 text-gray-400 hover:text-gray-200 text-2xl"
+          onClick={onClose}
+        >
+          &times;
+        </button>
+        <h2 className="text-2xl font-bold mb-6 text-white">Add New Transaction</h2>
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium mb-1 text-gray-800">Title</label>
+            <label className="block text-sm font-semibold mb-1 text-gray-200">Title</label>
             <input
               type="text"
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring placeholder-gray-500"
-              placeholder="e.g. Grocery shopping"
+              className="w-full bg-[#232B39] border border-[#2D3748] rounded-lg px-3 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="e.g., Zomato Order"
               value={title}
               onChange={e => setTitle(e.target.value)}
               disabled={loading}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1 text-gray-800">Amount</label>
+            <label className="block text-sm font-semibold mb-1 text-gray-200">Amount</label>
             <input
               type="number"
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring placeholder-gray-500"
-              placeholder="e.g. 500"
+              className="w-full bg-[#232B39] border border-[#2D3748] rounded-lg px-3 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="e.g., 500"
               value={amount}
               onChange={e => setAmount(e.target.value)}
               disabled={loading}
@@ -71,22 +78,40 @@ function AddTransactionModal({ onClose, onAdd }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1 text-gray-800">Category</label>
+            <label className="block text-sm font-semibold mb-1 text-gray-200">Category</label>
             <input
               type="text"
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring placeholder-gray-500"
-              placeholder="e.g. Food, Shopping"
+              className="w-full bg-[#232B39] border border-[#2D3748] rounded-lg px-3 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="e.g., Food"
               value={category}
               onChange={e => setCategory(e.target.value)}
               disabled={loading}
             />
           </div>
+                <div>
+        <label className="block text-sm font-semibold mb-1 text-gray-200">Payment Mode</label>
+        <select
+          className="w-full bg-[#232B39] border border-[#2D3748] rounded-lg px-3 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary"
+          value={paymentMode}
+          onChange={e => setPaymentMode(e.target.value)}
+          disabled={loading}
+        >
+          <option value="">Select Payment Mode</option>
+          <option value="Cash">Cash</option>
+          <option value="Card">Card</option>
+          <option value="UPI">UPI</option>
+        </select>
+      </div>
           <div>
-            <label className="block text-sm font-medium mb-1 text-gray-800">Type</label>
+            <label className="block text-sm font-semibold mb-1 text-gray-200">Type</label>
             <div className="flex gap-2">
               <button
                 type="button"
-                className={`flex-1 px-3 py-2 rounded ${type === 'Expense' ? 'bg-red-400 text-white' : 'bg-gray-100 text-gray-700'}`}
+                className={`flex-1 py-2 rounded-lg font-semibold transition ${
+                  type === 'Expense'
+                    ? 'bg-primary text-white'
+                    : 'bg-[#232B39] text-gray-300'
+                }`}
                 onClick={() => setType('Expense')}
                 disabled={loading}
               >
@@ -94,7 +119,11 @@ function AddTransactionModal({ onClose, onAdd }) {
               </button>
               <button
                 type="button"
-                className={`flex-1 px-3 py-2 rounded ${type === 'Income' ? 'bg-green-400 text-white' : 'bg-gray-100 text-gray-700'}`}
+                className={`flex-1 py-2 rounded-lg font-semibold transition ${
+                  type === 'Income'
+                    ? 'bg-primary text-white'
+                    : 'bg-[#232B39] text-gray-300'
+                }`}
                 onClick={() => setType('Income')}
                 disabled={loading}
               >
@@ -102,14 +131,26 @@ function AddTransactionModal({ onClose, onAdd }) {
               </button>
             </div>
           </div>
-          {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-          <button
-            type="submit"
-            className="w-full bg-primary text-white py-2 rounded font-semibold mt-2 disabled:opacity-60"
-            disabled={loading}
-          >
-            {loading ? 'Saving...' : 'Save'}
-          </button>
+          {error && (
+            <div className="text-red-400 text-sm text-center">{error}</div>
+          )}
+          <div className="flex justify-end items-center gap-4 pt-2">
+            <button
+              type="button"
+              className="text-gray-300 hover:text-white font-semibold"
+              onClick={onClose}
+              disabled={loading}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-primary text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-primary-dark transition disabled:opacity-60"
+              disabled={loading}
+            >
+              {loading ? 'Saving...' : 'Save Transaction'}
+            </button>
+          </div>
         </form>
       </div>
     </div>

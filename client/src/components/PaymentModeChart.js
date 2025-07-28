@@ -1,7 +1,7 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
-// Define a color palette for categories
+// Define a color palette for payment modes
 const COLORS = [
   '#34d399', // green
   '#f87171', // red
@@ -15,17 +15,21 @@ const COLORS = [
   '#4ade80', // emerald
 ];
 
-function ExpenseChart({ data = [], total = 0 }) {
-  // Assign a color to each category
-  const chartData = data.map((item, idx) => ({ ...item, color: COLORS[idx % COLORS.length] }));
+function PaymentModeChart({ data = [], total = 0 }) {
+  // Clean and assign colors to payment modes
+  const chartData = data.map((item, idx) => ({
+    ...item,
+    paymentMode: item.paymentMode || 'Cash', // Handle null/undefined values
+    color: COLORS[idx % COLORS.length]
+  }));
 
   if (!total || total <= 0) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="text-4xl mb-2">📊</div>
-          <p className="text-on-surface-secondary text-sm">No expenses yet</p>
-          <p className="text-xs text-on-surface-secondary">Add your first expense to see the breakdown</p>
+          <div className="text-4xl mb-2">💳</div>
+          <p className="text-on-surface-secondary text-sm">No payment data yet</p>
+          <p className="text-xs text-on-surface-secondary">Add transactions to see payment breakdown</p>
         </div>
       </div>
     );
@@ -41,7 +45,7 @@ function ExpenseChart({ data = [], total = 0 }) {
               <Pie
                 data={chartData}
                 dataKey="amount"
-                nameKey="category"
+                nameKey="paymentMode"
                 cx="50%"
                 cy="50%"
                 innerRadius={40}
@@ -69,10 +73,10 @@ function ExpenseChart({ data = [], total = 0 }) {
       <div className="flex-1 flex flex-col justify-center overflow-hidden">
         <div className="space-y-1 max-h-full overflow-y-auto pr-1">
           {chartData.map((item, idx) => (
-            <div key={item.category} className="flex items-center justify-between p-1.5 bg-background/30 rounded text-xs">
+            <div key={item.paymentMode} className="flex items-center justify-between p-1.5 bg-background/30 rounded text-xs">
               <div className="flex items-center gap-1.5 min-w-0 flex-1">
                 <span className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }}></span>
-                <span className="font-medium text-on-surface truncate">{item.category}</span>
+                <span className="font-medium text-on-surface truncate">{item.paymentMode}</span>
               </div>
               <span className="text-on-surface-secondary font-semibold ml-1 flex-shrink-0">{item.percent}%</span>
             </div>
@@ -83,4 +87,4 @@ function ExpenseChart({ data = [], total = 0 }) {
   );
 }
 
-export default ExpenseChart; 
+export default PaymentModeChart;
