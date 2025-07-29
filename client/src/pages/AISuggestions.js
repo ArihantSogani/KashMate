@@ -62,7 +62,7 @@ function AISuggestions() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-on-surface">AI-Powered Insights</h1>
-              <p className="text-sm text-on-surface-secondary">Smart suggestions for better financial management</p>
+              {/* <p className="text-sm text-on-surface-secondary">Smart suggestions for better financial management</p> */}
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>

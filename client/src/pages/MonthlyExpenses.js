@@ -62,7 +62,7 @@ function MonthlyExpenses() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-on-surface">Monthly Expense Analysis</h1>
-              <p className="text-sm text-on-surface-secondary">Comprehensive monthly financial insights and reports</p>
+              {/* <p className="text-sm text-on-surface-secondary">Comprehensive monthly financial insights and reports</p> */}
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>

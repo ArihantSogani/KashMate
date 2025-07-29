@@ -39,8 +39,8 @@ function App() {
                   <span className="text-background text-xl font-bold">💸</span>
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-on-surface tracking-tight">Money Manager</h1>
-                  <p className="text-xs text-on-surface-secondary -mt-1">Smart Finance Tracking</p>
+                  <h1 className="text-xl font-bold text-on-surface tracking-tight">KashMate</h1>
+                  {/* <p className="text-xs text-on-surface-secondary -mt-1">Smart Finance Tracking</p> */}
                 </div>
               </div>
             </div>

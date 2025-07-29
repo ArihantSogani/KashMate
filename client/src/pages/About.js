@@ -109,8 +109,8 @@ function About() {
         <div className="bg-surface/60 backdrop-blur-sm border-b border-surface/30 p-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-on-surface">About Money Manager</h1>
-              <p className="text-sm text-on-surface-secondary">Smart finance tracking for everyone</p>
+              <h1 className="text-2xl font-bold text-on-surface">About KashMate</h1>
+              {/* <p className="text-sm text-on-surface-secondary">Smart finance tracking for everyone</p> */}
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
@@ -127,7 +127,7 @@ function About() {
               <div className="w-24 h-24 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
                 <span className="text-background text-4xl font-bold">💸</span>
               </div>
-              <h2 className="text-3xl font-bold text-on-surface mb-4">Welcome to Money Manager</h2>
+              <h2 className="text-3xl font-bold text-on-surface mb-4">Welcome to KashMate</h2>
               <p className="text-lg text-on-surface-secondary max-w-2xl mx-auto">
                 Your personal finance companion designed to help you track expenses, manage income, 
                 and gain insights into your spending patterns with beautiful visualizations and smart analytics.
@@ -343,7 +343,7 @@ function About() {
                     onChange={handleInputChange}
                     rows={4}
                     className="w-full px-4 py-3 bg-background/50 border border-surface/30 rounded-lg focus:border-primary focus:outline-none text-on-surface resize-none"
-                    placeholder="Share your experience with Money Manager..."
+                    placeholder="Share your experience with KashMate..."
                     required
                   ></textarea>
                 </div>
