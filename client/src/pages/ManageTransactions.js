@@ -10,7 +10,7 @@ function ManageTransactions() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('all'); // 'all', 'income', 'expense'
+  const [filterType, setFilterType] = useState('all'); 
   const [filterCategory, setFilterCategory] = useState('all');
   const [categories, setCategories] = useState([]);
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, transactionId: null, transactionTitle: '' });
@@ -83,10 +83,10 @@ function ManageTransactions() {
       await axios.put(`/api/transactions/${transactionId}`, updatedData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      fetchTransactions(); // Refresh the list
+      fetchTransactions(); 
       setEditModal({ isOpen: false, transaction: null });
     } catch (err) {
-      throw err; // Let the modal handle the error
+      throw err; 
     }
   };
 

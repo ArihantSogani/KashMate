@@ -233,7 +233,7 @@ function Dashboard() {
                     <p className="text-xs text-on-surface-secondary">Add your first transaction to get started</p>
                   </div>
                 ) : (
-                  transactions.slice(0, 5).map(tx => (
+                  transactions.slice(0, 10).map(tx => (
                     <TransactionRow key={tx._id} tx={tx} />
                   ))
                 )}

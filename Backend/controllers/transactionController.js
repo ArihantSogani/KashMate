@@ -11,7 +11,7 @@ exports.addTransaction = async (req, res) => {
       title,
       amount,
       category,
-      paymentMode: req.body.paymentMode || 'Cash', // Default to 'Cash' if not provided
+      paymentMode: req.body.paymentMode || 'Cash', 
       type,
       date: date || Date.now(),
     });
@@ -30,7 +30,7 @@ exports.getPaymentModeSummary = async (req, res) => {
         $match: { 
           userId: new mongoose.Types.ObjectId(req.user.id), 
           type: 'Expense',
-          paymentMode: { $in: ['Cash', 'Card', 'UPI'] } // Only include valid payment modes
+          paymentMode: { $in: ['Cash', 'Card', 'UPI'] } 
         } 
       },
       { $group: { _id: '$paymentMode', totalAmount: { $sum: '$amount' } } }
