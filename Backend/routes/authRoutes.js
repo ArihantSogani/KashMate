@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { registerUser, loginUser, getMe, deleteUserByEmail, updateProfile, updatePassword } = require('../controllers/authController');
+const { registerUser, loginUser, getMe, deleteUserByEmail, updateProfile, updatePassword, forgotPassword, resetPassword } = require('../controllers/authController');
 const auth = require('../middleware/auth');
 
 // Register route
@@ -8,6 +8,12 @@ router.post('/register', registerUser);
 
 // Login route
 router.post('/login', loginUser);
+
+// Forgot password route
+router.post('/forgot-password', forgotPassword);
+
+// Reset password route
+router.post('/reset-password', resetPassword);
 
 // Get current user
 router.get('/me', auth, getMe);

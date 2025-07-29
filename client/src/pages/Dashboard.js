@@ -86,8 +86,12 @@ function Dashboard() {
     <div className="h-full flex bg-gradient-to-br from-background via-background to-surface/20">
       {/* Left Sidebar */}
       <div className="w-64 bg-surface/80 backdrop-blur-sm border-r border-surface/30 flex flex-col">
-        {/* User Profile Section */}
-        <div className="p-6 border-b border-surface/30">
+        {/* User Profile Section - Clickable for Settings */}
+        <div 
+          className="p-6 border-b border-surface/30 cursor-pointer hover:bg-surface/40 transition-all duration-200 rounded-lg mx-2 mt-2"
+          onClick={() => setShowSettings(true)}
+          title="Click to edit profile"
+        >
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
               <span className="text-primary font-bold text-lg">{user?.name?.charAt(0) || 'U'}</span>
@@ -114,24 +118,12 @@ function Dashboard() {
         </div>
 
         {/* Action Buttons */}
-        <div className="p-4 mt-auto space-y-3">
+        <div className="p-4 mt-auto">
           <button
             className="w-full bg-primary text-white py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
             onClick={() => setShowModal(true)}
           >
             + Add Transaction
-          </button>
-          <button
-            className="w-full bg-surface/60 text-on-surface py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border border-surface/30"
-            onClick={() => setShowSettings(true)}
-          >
-            ⚙️ Settings
-          </button>
-          <button
-            className="w-full bg-red-500/20 text-red-400 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 border border-red-500/30 hover:bg-red-500/30"
-            onClick={handleLogout}
-          >
-            🚪 Logout
           </button>
         </div>
       </div>
@@ -221,11 +213,14 @@ function Dashboard() {
 
             {/* Recent Transactions */}
             <div className="bg-surface/80 backdrop-blur-sm rounded-xl p-6 border border-surface/30">
-              <h3 className="text-lg font-semibold text-on-surface mb-4 flex items-center">
-                <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
-                Recent Transactions
+              <h3 className="text-lg font-semibold text-on-surface mb-4 flex items-center justify-between">
+                <div className="flex items-center">
+                  <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                  Recent Transactions
+                </div>
+                <span className="text-sm text-on-surface-secondary">({transactions.length} total)</span>
               </h3>
-              <div className="space-y-3 max-h-48 overflow-y-auto">
+              <div className="space-y-3 max-h-96 overflow-y-auto">
                 {transactions.length === 0 ? (
                   <div className="text-center py-8">
                     <div className="text-4xl mb-2">📝</div>
@@ -233,9 +228,12 @@ function Dashboard() {
                     <p className="text-xs text-on-surface-secondary">Add your first transaction to get started</p>
                   </div>
                 ) : (
-                  transactions.slice(0, 10).map(tx => (
-                    <TransactionRow key={tx._id} tx={tx} />
-                  ))
+                  <>
+                    {console.log('Rendering transactions:', transactions.length)}
+                    {transactions.map(tx => (
+                      <TransactionRow key={tx._id} tx={tx} />
+                    ))}
+                  </>
                 )}
               </div>
             </div>

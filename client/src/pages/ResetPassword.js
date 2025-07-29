@@ -1,33 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 
-function Register() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+function ResetPassword() {
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [token, setToken] = useState('');
+
+  useEffect(() => {
+    const tokenFromUrl = searchParams.get('token');
+    if (tokenFromUrl) {
+      setToken(tokenFromUrl);
+    } else {
+      setError('Invalid reset link. Please request a new password reset.');
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    try {
-      const response = await axios.post('/api/auth/register', { name, email, password });
+    setSuccess('');
 
-      const { token } = response.data;
-      localStorage.setItem('token', token);
-      navigate('/dashboard');
+    // Validate passwords match
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    // Validate password length
+    if (newPassword.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await axios.post('/api/auth/reset-password', {
+        token,
+        newPassword
+      });
+      setSuccess(response.data.message);
+      
+      // Redirect to login after 3 seconds
+      setTimeout(() => {
+        navigate('/login');
+      }, 3000);
     } catch (err) {
-      console.error('Registration error:', err);
+      console.error('Reset password error:', err);
       if (err.response && err.response.data && err.response.data.message) {
         setError(err.response.data.message);
       } else if (err.message) {
-        setError(`Registration failed: ${err.message}`);
+        setError(`Reset failed: ${err.message}`);
       } else {
-        setError('Registration failed. Please try again.');
+        setError('Reset failed. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -74,74 +106,62 @@ function Register() {
         </div>
       </div>
 
-      {/* Register Form Container */}
+      {/* Reset Password Form Container */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-4 lg:p-8 bg-background">
         <div className="w-full max-w-md animate-fade-in-up">
-          <h2 className="text-3xl font-bold text-on-surface mb-2 text-center">Join KashMate</h2>
-          <p className="text-on-surface-secondary text-center mb-8">Create your account to get started</p>
+          <h2 className="text-3xl font-bold text-on-surface mb-2 text-center">Reset Password</h2>
+          <p className="text-on-surface-secondary text-center mb-8">
+            Enter your new password below
+          </p>
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-on-surface-secondary mb-2 text-sm font-medium" htmlFor="name">
-                Full Name
-              </label>
-              <input
-                id="name"
-                type="text"
-                className="w-full px-4 py-3 rounded-lg bg-surface border border-surface focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none text-on-surface transition-all duration-300"
-                placeholder="Enter your full name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-            
-            <div>
-              <label className="block text-on-surface-secondary mb-2 text-sm font-medium" htmlFor="email">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                className="w-full px-4 py-3 rounded-lg bg-surface border border-surface focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none text-on-surface transition-all duration-300"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            
-            <div>
-              <label className="block text-on-surface-secondary mb-2 text-sm font-medium" htmlFor="password">
-                Password
+              <label className="block text-on-surface-secondary mb-2 text-sm font-medium" htmlFor="newPassword">
+                New Password
                 <span className="ml-1 text-xs text-on-surface-secondary">
                   (min. 6 characters)
                 </span>
               </label>
               <input
-                id="password"
+                id="newPassword"
                 type="password"
                 className="w-full px-4 py-3 rounded-lg bg-surface border border-surface focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none text-on-surface transition-all duration-300"
-                placeholder="Create a password (min. 6 characters)"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your new password (min. 6 characters)"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
                 required
                 minLength={6}
                 title="Password must be at least 6 characters long"
               />
             </div>
             
+            <div>
+              <label className="block text-on-surface-secondary mb-2 text-sm font-medium" htmlFor="confirmPassword">
+                Confirm New Password
+              </label>
+              <input
+                id="confirmPassword"
+                type="password"
+                className="w-full px-4 py-3 rounded-lg bg-surface border border-surface focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none text-on-surface transition-all duration-300"
+                placeholder="Confirm your new password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                minLength={6}
+              />
+            </div>
+            
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !token}
               className="w-full bg-primary text-background py-3 rounded-lg font-semibold hover:scale-105 transition-all duration-300 disabled:opacity-60 disabled:scale-100"
             >
-              {loading ? 'Creating account...' : 'Create Account'}
+              {loading ? 'Resetting...' : 'Reset Password'}
             </button>
           </form>
           
           <div className="mt-6 text-center">
-            <span className="text-on-surface-secondary">Already have an account? </span>
+            <span className="text-on-surface-secondary">Remember your password? </span>
             <Link
               to="/login"
               className="text-primary font-semibold hover:underline transition-colors duration-300"
@@ -150,10 +170,30 @@ function Register() {
             </Link>
           </div>
 
+          {/* Success Message */}
+          {success && (
+            <div className="mt-4 p-4 bg-income/10 border border-income/20 rounded-lg">
+              <p className="text-income text-center text-sm font-medium">{success}</p>
+              <p className="text-on-surface-secondary text-center text-xs mt-2">
+                Redirecting to login page...
+              </p>
+            </div>
+          )}
+
           {/* Error Message */}
           {error && (
             <div className="mt-4 p-3 bg-expense/10 border border-expense/20 rounded-lg">
               <p className="text-expense text-center text-sm">{error}</p>
+              {error.includes('Invalid reset link') && (
+                <div className="mt-3 text-center">
+                  <Link
+                    to="/forgot-password"
+                    className="text-primary font-semibold hover:underline transition-colors duration-300 text-sm"
+                  >
+                    Request New Reset Link
+                  </Link>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -162,4 +202,4 @@ function Register() {
   );
 }
 
-export default Register;
+export default ResetPassword; 

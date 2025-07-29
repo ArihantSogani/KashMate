@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function SettingsModal({ user, onClose, onUpdate }) {
+  const navigate = useNavigate();
+  
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    onClose();
+    navigate('/login');
+  };
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -94,12 +102,20 @@ function SettingsModal({ user, onClose, onUpdate }) {
         <div className="p-6 border-b border-surface/30">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-on-surface">Settings</h2>
-            <button
-              onClick={onClose}
-              className="text-on-surface-secondary hover:text-on-surface transition-colors"
-            >
-              ✕
-            </button>
+            <div className="flex items-center space-x-6">
+              <button
+                onClick={handleLogout}
+                className="bg-red-500/20 text-red-400 px-4 py-2 rounded-lg font-semibold hover:bg-red-500/30 transition-colors border border-red-500/30 text-sm"
+              >
+                🚪 Logout
+              </button>
+              <button
+                onClick={onClose}
+                className="text-on-surface-secondary hover:text-on-surface transition-colors"
+              >
+                ✕
+              </button>
+            </div>
           </div>
         </div>
 
@@ -201,6 +217,9 @@ function SettingsModal({ user, onClose, onUpdate }) {
               <div>
                 <label className="block text-sm font-medium text-on-surface-secondary mb-2">
                   New Password
+                  <span className="ml-1 text-xs text-on-surface-secondary">
+                    (min. 6 characters)
+                  </span>
                 </label>
                 <input
                   type="password"
@@ -208,8 +227,10 @@ function SettingsModal({ user, onClose, onUpdate }) {
                   value={formData.newPassword}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 bg-background/50 border border-surface/30 rounded-lg focus:border-primary focus:outline-none text-on-surface"
-                  placeholder="Enter new password"
+                  placeholder="Enter new password (min. 6 characters)"
                   required
+                  minLength={6}
+                  title="Password must be at least 6 characters long"
                 />
               </div>
 

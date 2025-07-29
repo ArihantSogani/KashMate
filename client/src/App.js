@@ -3,6 +3,9 @@ import { Routes, Route, Navigate, useLocation, Link } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Auth from './pages/Auth';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import ManageTransactions from './pages/ManageTransactions';
 import About from './pages/About';
 import AISuggestions from './pages/AISuggestions';
@@ -19,6 +22,7 @@ function RequireAuth({ children }) {
 
 function App() {
   const token = localStorage.getItem('token');
+  const location = useLocation();
   // const navigate = useNavigate();
 
   // const handleLogout = () => {
@@ -26,15 +30,19 @@ function App() {
   //   navigate('/login');
   // };
 
+  // Check if current page is an authentication page
+  const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password', '/auth'].includes(location.pathname);
+
   return ( 
     <div className="h-screen bg-background text-on-surface flex flex-col overflow-hidden">
-      {/* Navigation Bar */}
-      <nav className="bg-surface/90 backdrop-blur-md border-b border-surface/30 shadow-lg">
+      {/* Navigation Bar - Hidden on auth pages */}
+      {!isAuthPage && (
+        <nav className="bg-surface/90 backdrop-blur-md border-b border-surface/30 shadow-lg">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-16">
             {/* Logo Section */}
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-3">
+              <Link to="/dashboard" className="flex items-center space-x-3 hover:opacity-80 transition-opacity duration-200">
                 <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg">
                   <span className="text-background text-xl font-bold">💸</span>
                 </div>
@@ -42,7 +50,7 @@ function App() {
                   <h1 className="text-xl font-bold text-on-surface tracking-tight">KashMate</h1>
                   {/* <p className="text-xs text-on-surface-secondary -mt-1">Smart Finance Tracking</p> */}
                 </div>
-              </div>
+              </Link>
             </div>
 
             {/* Navigation Links */}
@@ -114,6 +122,7 @@ function App() {
           </div>
         </div>
       </nav>
+      )}
 
       {/* Main Content */}
       <main className="flex-1 overflow-hidden">
@@ -145,6 +154,9 @@ function App() {
           } />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/" element={token ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
           <Route path="*" element={<div className="text-center text-on-surface-secondary mt-8">Page not found.</div>} />
         </Routes>
