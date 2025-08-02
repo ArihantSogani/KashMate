@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 import { useNavigate } from 'react-router-dom';
 import StatCard from '../components/StatCard';
 import ExpenseChart from '../components/ExpenseChart';
@@ -62,17 +62,17 @@ function Dashboard() {
     try {
       setLoading(true);
       // Fetch user info
-      const userRes = await axios.get('/api/auth/me', {
+      const userRes = await api.get('/api/auth/me', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUser(userRes.data);
       // Fetch summary
-      const summaryRes = await axios.get('/api/transactions/summary', {
+              const summaryRes = await api.get('/api/transactions/summary', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSummary(summaryRes.data);
       // Fetch payment mode summary
-      const paymentModeRes = await axios.get('/api/transactions/summary/paymentMode', {
+              const paymentModeRes = await api.get('/api/transactions/summary/paymentMode', {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log('Payment mode response:', paymentModeRes.data);
@@ -89,7 +89,7 @@ function Dashboard() {
       setPaymentModeData(paymentDataWithPercent);
       setPaymentModeTotal(total);
       // Fetch today's transactions
-      const txRes = await axios.get('/api/transactions/today', {
+              const txRes = await api.get('/api/transactions/today', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTransactions(txRes.data);

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 import { Link } from 'react-router-dom';
 
 function ForgotPassword() {
@@ -16,7 +16,7 @@ function ForgotPassword() {
     setSuccess('');
     
     try {
-      const response = await axios.post('/api/auth/forgot-password', { email });
+      const response = await api.post('/api/auth/forgot-password', { email });
       setSuccess(response.data.message);
       // In development, show the token for testing
       if (response.data.resetToken) {

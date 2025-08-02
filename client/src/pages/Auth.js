@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 import { useNavigate, Link } from 'react-router-dom';
 
 function Auth() {
@@ -23,7 +23,7 @@ function Auth() {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.post('/api/auth/login', { 
+      const response = await api.post('/api/auth/login', { 
         email: loginEmail, 
         password: loginPassword 
       });
@@ -49,7 +49,7 @@ function Auth() {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.post('/api/auth/register', { 
+      const response = await api.post('/api/auth/register', { 
         name: registerName, 
         email: registerEmail, 
         password: registerPassword 

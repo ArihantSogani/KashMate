@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/axios';
 
 function About() {
   const [reviewForm, setReviewForm] = useState({
@@ -25,7 +25,7 @@ function About() {
     setError('');
 
     try {
-      await axios.post('/api/reviews', reviewForm);
+      await api.post('/api/reviews', reviewForm);
       setSuccess(true);
       setReviewForm({ name: '', email: '', rating: 5, message: '' });
       setTimeout(() => setSuccess(false), 3000);

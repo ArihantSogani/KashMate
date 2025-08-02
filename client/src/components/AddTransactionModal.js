@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 
 function toTitleCase(str) {
   return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
@@ -25,7 +25,7 @@ function AddTransactionModal({ onClose, onAdd }) {
     setLoading(true);
     try {
       const formattedCategory = toTitleCase(category.trim());
-      await axios.post('/api/transactions', {
+      await api.post('/api/transactions', {
         title: title.trim(),
         amount: Number(amount),
         category: formattedCategory,

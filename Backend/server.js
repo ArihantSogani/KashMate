@@ -6,7 +6,16 @@ require('dotenv').config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://kash-mate.vercel.app',
+    'https://money-manager-sandy.vercel.app',
+    'https://kashmate.vercel.app',
+    'https://kashmate-frontend.vercel.app'
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 app.use((req, res, next) => {

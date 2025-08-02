@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 import { useNavigate, Link } from 'react-router-dom';
 
 function Register() {
@@ -15,7 +15,7 @@ function Register() {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.post('/api/auth/register', { name, email, password });
+      const response = await api.post('/api/auth/register', { name, email, password });
 
       const { token } = response.data;
       localStorage.setItem('token', token);

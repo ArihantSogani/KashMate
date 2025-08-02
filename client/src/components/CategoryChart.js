@@ -1,6 +1,6 @@
                               // src/components/CategoryChart.jsx
                               import React, { useEffect, useState } from 'react';
-                              import axios from 'axios';
+                              import api from '../config/axios';
                               import {
                                 BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer
                               } from 'recharts';
@@ -11,11 +11,7 @@
                                 useEffect(() => {
                                   const fetchSummary = async () => {
                                     try {
-                                      const res = await axios.get('http://localhost:5000/api/expenses/summary/category', {
-                                        headers: {
-                                          Authorization: `Bearer ${token}`
-                                        }
-                                      });
+                                      const res = await api.get('/api/expenses/summary/category');
                                       // Format for Recharts: [{ category: "Food", totalAmount: 200 }, ...]
                                       const formatted = res.data.map(item => ({
                                         category: item._id,

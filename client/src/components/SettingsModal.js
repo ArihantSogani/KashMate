@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 import { useNavigate } from 'react-router-dom';
 
 function SettingsModal({ user, onClose, onUpdate }) {
@@ -38,7 +38,7 @@ function SettingsModal({ user, onClose, onUpdate }) {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.put('/api/auth/update-profile', {
+      const response = await api.put('/api/auth/update-profile', {
         name: formData.name,
         email: formData.email
       }, {
@@ -74,7 +74,7 @@ function SettingsModal({ user, onClose, onUpdate }) {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.put('/api/auth/update-password', {
+      const response = await api.put('/api/auth/update-password', {
         currentPassword: formData.currentPassword,
         newPassword: formData.newPassword
       }, {

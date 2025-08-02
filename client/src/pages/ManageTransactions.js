@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 import { useNavigate } from 'react-router-dom';
 import TransactionRow from '../components/TransactionRow';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
@@ -31,9 +31,7 @@ function ManageTransactions() {
     }
     try {
       setLoading(true);
-      const response = await axios.get('/api/transactions', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get('/api/transactions');
       setTransactions(response.data);
       
       // Extract unique categories
@@ -63,9 +61,7 @@ function ManageTransactions() {
 
   const handleDeleteConfirm = async () => {
     try {
-      await axios.delete(`/api/transactions/${deleteModal.transactionId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.delete(`/api/transactions/${deleteModal.transactionId}`);
       fetchTransactions(); // Refresh the list
       setDeleteModal({ isOpen: false, transactionId: null, transactionTitle: '' });
     } catch (err) {
@@ -80,9 +76,7 @@ function ManageTransactions() {
 
   const handleEditUpdate = async (transactionId, updatedData) => {
     try {
-      await axios.put(`/api/transactions/${transactionId}`, updatedData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.put(`/api/transactions/${transactionId}`, updatedData);
       fetchTransactions(); 
       setEditModal({ isOpen: false, transaction: null });
     } catch (err) {

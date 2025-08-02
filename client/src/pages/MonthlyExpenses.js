@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/axios';
 import TransactionRow from '../components/TransactionRow';
 
 function MonthlyExpenses() {
@@ -45,7 +45,7 @@ function MonthlyExpenses() {
     }
     try {
       setLoading(true);
-      const response = await axios.get('/api/transactions', {
+      const response = await api.get('/api/transactions', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTransactions(response.data);
@@ -238,13 +238,13 @@ function MonthlyExpenses() {
           </div>
         </div>
 
-                 {/* Quick Info */}
-         <div className="p-4 space-y-4">
-           <div className="bg-background/50 rounded-lg p-3">
+        {/* Quick Info */}
+        <div className="p-4 space-y-4">
+          <div className="bg-background/50 rounded-lg p-3">
              <p className="text-xs text-on-surface-secondary mb-1">Total Transactions</p>
              <p className="text-lg font-bold text-primary">{transactions.length}</p>
-           </div>
-           <div className="bg-background/50 rounded-lg p-3">
+          </div>
+          <div className="bg-background/50 rounded-lg p-3">
              <p className="text-xs text-on-surface-secondary mb-1">Filtered</p>
              <p className="text-lg font-bold text-green-400">{filteredTransactions.length}</p>
            </div>
@@ -284,8 +284,8 @@ function MonthlyExpenses() {
              >
                💸 Expense Only
              </button>
-           </div>
-         </div>
+          </div>
+        </div>
 
         {/* Action Buttons */}
         <div className="p-4 mt-auto space-y-3">
@@ -316,7 +316,7 @@ function MonthlyExpenses() {
             <div className="flex items-center space-x-4">
                              {/* Custom Date Filter */}
                <div className="relative date-picker-container">
-                 <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2">
                    <label className="text-sm text-on-surface-secondary">Filter by date:</label>
                    <button
                      onClick={() => setShowDatePicker(!showDatePicker)}
@@ -415,8 +415,8 @@ function MonthlyExpenses() {
           </div>
         </div>
 
-                 {/* Content */}
-         <div className="flex-1 p-6 overflow-auto">
+        {/* Content */}
+        <div className="flex-1 p-6 overflow-auto">
            <div className="max-w-6xl mx-auto">
                          {/* Summary Cards */}
              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -429,38 +429,38 @@ function MonthlyExpenses() {
                    </div>
                    <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
                      <span className="text-green-400 text-lg">↑</span>
-                   </div>
-                 </div>
-               </div>
+              </div>
+              </div>
+            </div>
 
                {/* Total Expense */}
                <div className="bg-red-500/20 border border-red-500/30 rounded-xl p-4">
                  <div className="flex items-center justify-between">
-                   <div>
+                  <div>
                      <p className="text-sm text-red-400 mb-1">Total Expense</p>
                      <p className="text-2xl font-bold text-red-400">₹{monthlySummary.expense}</p>
-                   </div>
+                  </div>
                    <div className="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
                      <span className="text-red-400 text-lg">↓</span>
-                   </div>
-                 </div>
-               </div>
+                  </div>
+                </div>
+              </div>
 
                {/* Net Balance */}
                <div className="bg-blue-500/20 border border-blue-500/30 rounded-xl p-4">
                  <div className="flex items-center justify-between">
-                   <div>
+                  <div>
                      <p className="text-sm text-blue-400 mb-1">Net Balance</p>
                      <p className={`text-2xl font-bold ${monthlySummary.income - monthlySummary.expense >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                        ₹{monthlySummary.income - monthlySummary.expense}
                      </p>
-                   </div>
+                  </div>
                    <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
                      <span className="text-blue-400 text-lg">💰</span>
-                   </div>
-                 </div>
-               </div>
-             </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
                            {/* Filter Status */}
               <div className="mb-6">
@@ -481,7 +481,7 @@ function MonthlyExpenses() {
                         {transactionFilter === 'income' && 'Income only'}
                         {transactionFilter === 'expense' && 'Expense only'}
                       </p>
-                    </div>
+                  </div>
                     <div className="text-right">
                       <p className={`text-lg font-bold ${
                         showAllTransactions ? 'text-blue-400' : 'text-green-400'
@@ -491,7 +491,7 @@ function MonthlyExpenses() {
                       <p className="text-xs text-on-surface-secondary">
                         of {transactions.length} total
                       </p>
-                    </div>
+                  </div>
                   </div>
                 </div>
               </div>
