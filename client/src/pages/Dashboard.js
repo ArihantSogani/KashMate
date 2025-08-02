@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../config/axios';
-import { useNavigate } from 'react-router-dom';
-import StatCard from '../components/StatCard';
+// import { useNavigate } from 'react-router-dom';
 import ExpenseChart from '../components/ExpenseChart';
 import TransactionRow from '../components/TransactionRow';
 import AddTransactionModal from '../components/AddTransactionModal';
@@ -22,12 +21,9 @@ function Dashboard() {
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [filteredSummary, setFilteredSummary] = useState(null);
   const token = localStorage.getItem('token');
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // Unused variable
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
+  // handleLogout is now handled in SettingsModal
 
   // Apply transaction type filter
   const applyTransactionFilter = (filterType) => {
@@ -227,6 +223,7 @@ function Dashboard() {
                     <span className="text-green-400 text-lg">↑</span>
                   </div>
                 </div>
+
               </div>
               
               <div className="bg-surface/80 backdrop-blur-sm rounded-xl p-4 border border-surface/30">

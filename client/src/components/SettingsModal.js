@@ -37,12 +37,10 @@ function SettingsModal({ user, onClose, onUpdate }) {
     setSuccess('');
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await api.put('/api/auth/update-profile', {
+      // const token = localStorage.getItem('token');
+      await api.put('/api/auth/update-profile', {
         name: formData.name,
         email: formData.email
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
 
       setSuccess('Profile updated successfully!');
@@ -73,12 +71,10 @@ function SettingsModal({ user, onClose, onUpdate }) {
     }
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await api.put('/api/auth/update-password', {
+      // const token = localStorage.getItem('token');
+      await api.put('/api/auth/update-password', {
         currentPassword: formData.currentPassword,
         newPassword: formData.newPassword
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
 
       setSuccess('Password updated successfully!');

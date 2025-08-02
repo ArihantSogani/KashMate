@@ -119,6 +119,7 @@ const sendWelcomeEmail = async (email, name) => {
               Hello ${name},
             </p>
             
+            
             <p style="color: #666; line-height: 1.6;">
               Welcome to KashMate! Your account has been successfully created and you're now ready to start managing your finances smarter.
             </p>

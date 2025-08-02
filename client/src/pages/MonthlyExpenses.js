@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../config/axios';
 import TransactionRow from '../components/TransactionRow';
@@ -36,8 +36,23 @@ function MonthlyExpenses() {
     navigate('/login');
   };
 
+  // Apply filters (date + transaction type)
+  const applyFilters = useCallback((transactionsToFilter, typeFilter = transactionFilter) => {
+    let filtered = transactionsToFilter;
+    
+    // Apply transaction type filter
+    if (typeFilter === 'income') {
+      filtered = filtered.filter(tx => tx.type === 'Income');
+    } else if (typeFilter === 'expense') {
+      filtered = filtered.filter(tx => tx.type === 'Expense');
+    }
+    
+    setFilteredTransactions(filtered);
+    setMonthlySummary(calculateSummary(filtered));
+  }, [transactionFilter]);
+
   // Fetch all transactions
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     if (!token) {
       setError('Not authenticated');
       setLoading(false);
@@ -45,9 +60,7 @@ function MonthlyExpenses() {
     }
     try {
       setLoading(true);
-      const response = await api.get('/api/transactions', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get('/api/transactions');
       setTransactions(response.data);
       applyFilters(response.data);
     } catch (err) {
@@ -55,7 +68,7 @@ function MonthlyExpenses() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token, applyFilters]);
 
   // Calculate summary for transactions
   const calculateSummary = (transactions) => {
@@ -112,20 +125,7 @@ function MonthlyExpenses() {
     }
   };
 
-  // Apply filters (date + transaction type)
-  const applyFilters = (transactionsToFilter, typeFilter = transactionFilter) => {
-    let filtered = transactionsToFilter;
-    
-    // Apply transaction type filter
-    if (typeFilter === 'income') {
-      filtered = filtered.filter(tx => tx.type === 'Income');
-    } else if (typeFilter === 'expense') {
-      filtered = filtered.filter(tx => tx.type === 'Expense');
-    }
-    
-    setFilteredTransactions(filtered);
-    setMonthlySummary(calculateSummary(filtered));
-  };
+
 
   // Handle date selection
   const handleDateChange = (date) => {
@@ -159,7 +159,7 @@ function MonthlyExpenses() {
     const currentMonthIndex = currentMonth.getMonth();
     
     const firstDay = new Date(currentYear, currentMonthIndex, 1);
-    const lastDay = new Date(currentYear, currentMonthIndex + 1, 0);
+    // const lastDay = new Date(currentYear, currentMonthIndex + 1, 0); // Unused variable
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
     
@@ -203,7 +203,7 @@ function MonthlyExpenses() {
 
   useEffect(() => {
     fetchTransactions();
-  }, []);
+  }, [fetchTransactions]);
 
   if (loading) return (
     <div className="h-full flex bg-gradient-to-br from-background via-background to-surface/20">

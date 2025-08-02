@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import api from '../config/axios';
 import { useNavigate } from 'react-router-dom';
 import TransactionRow from '../components/TransactionRow';
@@ -23,7 +23,7 @@ function ManageTransactions() {
     navigate('/login');
   };
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     if (!token) {
       setError('Not authenticated');
       setLoading(false);
@@ -42,7 +42,7 @@ function ManageTransactions() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   const handleDeleteClick = (transactionId, transactionTitle) => {
     setDeleteModal({
@@ -90,7 +90,7 @@ function ManageTransactions() {
 
   useEffect(() => {
     fetchTransactions();
-  }, [token]);
+  }, [token, fetchTransactions]);
 
   // Filter transactions based on search and filters
   const filteredTransactions = transactions.filter(tx => {
