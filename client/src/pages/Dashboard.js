@@ -18,12 +18,38 @@ function Dashboard() {
   const [showSettings, setShowSettings] = useState(false);
   const [paymentModeData, setPaymentModeData] = useState([]);
   const [paymentModeTotal, setPaymentModeTotal] = useState(0);
+  const [transactionFilter, setTransactionFilter] = useState('all'); // 'all', 'income', 'expense'
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
+  const [filteredSummary, setFilteredSummary] = useState(null);
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
+  };
+
+  // Apply transaction type filter
+  const applyTransactionFilter = (filterType) => {
+    setTransactionFilter(filterType);
+    
+    // Filter transactions
+    let filtered = transactions;
+    if (filterType === 'income') {
+      filtered = transactions.filter(tx => tx.type === 'Income');
+    } else if (filterType === 'expense') {
+      filtered = transactions.filter(tx => tx.type === 'Expense');
+    }
+    setFilteredTransactions(filtered);
+    
+    // Calculate filtered summary
+    const filteredSummaryData = {
+      totalIncome: filtered.filter(tx => tx.type === 'Income').reduce((sum, tx) => sum + tx.amount, 0),
+      totalExpense: filtered.filter(tx => tx.type === 'Expense').reduce((sum, tx) => sum + tx.amount, 0),
+      totalBalance: 0
+    };
+    filteredSummaryData.totalBalance = filteredSummaryData.totalIncome - filteredSummaryData.totalExpense;
+    setFilteredSummary(filteredSummaryData);
   };
 
   // Refactored data fetching for reuse
@@ -62,11 +88,13 @@ function Dashboard() {
       console.log('Payment data with percent:', paymentDataWithPercent);
       setPaymentModeData(paymentDataWithPercent);
       setPaymentModeTotal(total);
-      // Fetch transactions
-      const txRes = await axios.get('/api/transactions', {
+      // Fetch today's transactions
+      const txRes = await axios.get('/api/transactions/today', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTransactions(txRes.data);
+      setFilteredTransactions(txRes.data);
+      setFilteredSummary(summaryRes.data);
     } catch (err) {
       setError('Failed to load dashboard data');
     } finally {
@@ -107,13 +135,50 @@ function Dashboard() {
         <div className="p-4 space-y-3">
           <div className="bg-background/50 rounded-lg p-3">
             <p className="text-xs text-on-surface-secondary mb-1">Total Balance</p>
-            <p className={`text-lg font-bold ${summary?.totalBalance >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              ₹{summary?.totalBalance || 0}
+            <p className={`text-lg font-bold ${(filteredSummary || summary)?.totalBalance >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              ₹{(filteredSummary || summary)?.totalBalance || 0}
             </p>
           </div>
           <div className="bg-background/50 rounded-lg p-3">
-            <p className="text-xs text-on-surface-secondary mb-1">This Month</p>
-            <p className="text-lg font-bold text-red-400">₹{summary?.totalExpense || 0}</p>
+            <p className="text-xs text-on-surface-secondary mb-1">Today's Transactions</p>
+            <p className="text-lg font-bold text-primary">{filteredTransactions.length}</p>
+          </div>
+        </div>
+
+        {/* Filter Options */}
+        <div className="p-4 border-t border-surface/30">
+          <h3 className="text-sm font-semibold text-on-surface mb-3">Filter Today's Transactions</h3>
+          <div className="space-y-2">
+            <button
+              onClick={() => applyTransactionFilter('all')}
+              className={`w-full py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                transactionFilter === 'all'
+                  ? 'bg-primary text-background shadow-lg'
+                  : 'bg-surface/50 text-on-surface hover:bg-surface/70'
+              }`}
+            >
+              📊 All Transactions
+            </button>
+            <button
+              onClick={() => applyTransactionFilter('income')}
+              className={`w-full py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                transactionFilter === 'income'
+                  ? 'bg-green-500 text-background shadow-lg'
+                  : 'bg-surface/50 text-green-400 hover:bg-green-500/20'
+              }`}
+            >
+              💰 Income Only
+            </button>
+            <button
+              onClick={() => applyTransactionFilter('expense')}
+              className={`w-full py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                transactionFilter === 'expense'
+                  ? 'bg-red-500 text-background shadow-lg'
+                  : 'bg-surface/50 text-red-400 hover:bg-red-500/20'
+              }`}
+            >
+              💸 Expense Only
+            </button>
           </div>
         </div>
 
@@ -152,8 +217,11 @@ function Dashboard() {
               <div className="bg-surface/80 backdrop-blur-sm rounded-xl p-4 border border-surface/30">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-on-surface-secondary">Total Income</p>
-                    <p className="text-xl font-bold text-green-400">₹{summary?.totalIncome || 0}</p>
+                    <p className="text-sm text-on-surface-secondary">
+                      {transactionFilter === 'all' ? 'Total Income' : 
+                       transactionFilter === 'income' ? 'Income Today' : 'Income Today'}
+                    </p>
+                    <p className="text-xl font-bold text-green-400">₹{(filteredSummary || summary)?.totalIncome || 0}</p>
                   </div>
                   <div className="w-10 h-10 bg-green-400/20 rounded-lg flex items-center justify-center">
                     <span className="text-green-400 text-lg">↑</span>
@@ -164,8 +232,11 @@ function Dashboard() {
               <div className="bg-surface/80 backdrop-blur-sm rounded-xl p-4 border border-surface/30">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-on-surface-secondary">Total Expense</p>
-                    <p className="text-xl font-bold text-red-400">₹{summary?.totalExpense || 0}</p>
+                    <p className="text-sm text-on-surface-secondary">
+                      {transactionFilter === 'all' ? 'Total Expense' : 
+                       transactionFilter === 'expense' ? 'Expense Today' : 'Expense Today'}
+                    </p>
+                    <p className="text-xl font-bold text-red-400">₹{(filteredSummary || summary)?.totalExpense || 0}</p>
                   </div>
                   <div className="w-10 h-10 bg-red-400/20 rounded-lg flex items-center justify-center">
                     <span className="text-red-400 text-lg">↓</span>
@@ -176,8 +247,11 @@ function Dashboard() {
               <div className="bg-surface/80 backdrop-blur-sm rounded-xl p-4 border border-surface/30">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-on-surface-secondary">Transactions</p>
-                    <p className="text-xl font-bold text-primary">{transactions.length}</p>
+                    <p className="text-sm text-on-surface-secondary">
+                      {transactionFilter === 'all' ? 'Transactions' : 
+                       transactionFilter === 'income' ? 'Income Count' : 'Expense Count'}
+                    </p>
+                    <p className="text-xl font-bold text-primary">{filteredTransactions.length}</p>
                   </div>
                   <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
                     <span className="text-primary text-lg">📊</span>
@@ -211,26 +285,36 @@ function Dashboard() {
               </div>
             </div>
 
-            {/* Recent Transactions */}
+            {/* Today's Transactions */}
             <div className="bg-surface/80 backdrop-blur-sm rounded-xl p-6 border border-surface/30">
               <h3 className="text-lg font-semibold text-on-surface mb-4 flex items-center justify-between">
                 <div className="flex items-center">
                   <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
-                  Recent Transactions
+                  {transactionFilter === 'all' ? "Today's Transactions" : 
+                   transactionFilter === 'income' ? "Today's Income" : "Today's Expenses"}
                 </div>
-                <span className="text-sm text-on-surface-secondary">({transactions.length} total)</span>
+                <span className="text-sm text-on-surface-secondary">
+                  ({filteredTransactions.length} {transactionFilter === 'all' ? 'today' : 
+                   transactionFilter === 'income' ? 'income' : 'expense'})
+                </span>
               </h3>
               <div className="space-y-3 max-h-96 overflow-y-auto">
-                {transactions.length === 0 ? (
+                {filteredTransactions.length === 0 ? (
                   <div className="text-center py-8">
-                    <div className="text-4xl mb-2">📝</div>
-                    <p className="text-on-surface-secondary">No transactions yet</p>
-                    <p className="text-xs text-on-surface-secondary">Add your first transaction to get started</p>
+                    <div className="text-4xl mb-2">📅</div>
+                    <p className="text-on-surface-secondary">
+                      {transactionFilter === 'all' ? 'No transactions today' : 
+                       transactionFilter === 'income' ? 'No income transactions today' : 'No expense transactions today'}
+                    </p>
+                    <p className="text-xs text-on-surface-secondary">
+                      {transactionFilter === 'all' ? 'Add a transaction to see it here' : 
+                       transactionFilter === 'income' ? 'Add an income transaction to see it here' : 'Add an expense transaction to see it here'}
+                    </p>
                   </div>
                 ) : (
                   <>
-                    {console.log('Rendering transactions:', transactions.length)}
-                    {transactions.map(tx => (
+                    {console.log('Rendering filtered transactions:', filteredTransactions.length)}
+                    {filteredTransactions.map(tx => (
                       <TransactionRow key={tx._id} tx={tx} />
                     ))}
                   </>

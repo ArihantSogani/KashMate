@@ -4,6 +4,8 @@ const auth = require('../middleware/auth');
 const {
   addTransaction,
   getTransactions,
+  getTodayTransactions,
+  getTransactionsByDate,
   getSummary,
   deleteTransaction,
   updateTransaction,
@@ -15,6 +17,12 @@ router.post('/', auth, addTransaction);
 
 // Get all transactions for the user
 router.get('/', auth, getTransactions);
+
+// Get today's transactions for dashboard
+router.get('/today', auth, getTodayTransactions);
+
+// Get transactions by date range
+router.get('/by-date', auth, getTransactionsByDate);
 
 // Update a transaction
 router.put('/:id', auth, updateTransaction);

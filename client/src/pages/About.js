@@ -76,10 +76,10 @@ function About() {
 
         {/* Quick Info */}
         <div className="p-4 space-y-4">
-          <div className="bg-background/50 rounded-lg p-3">
-            <p className="text-xs text-on-surface-secondary mb-1">Version</p>
-            <p className="text-lg font-bold text-primary">1.0.0</p>
-          </div>
+                     <div className="bg-background/50 rounded-lg p-3">
+             <p className="text-xs text-on-surface-secondary mb-1">Version</p>
+             <p className="text-lg font-bold text-primary">1.1.0</p>
+           </div>
           <div className="bg-background/50 rounded-lg p-3">
             <p className="text-xs text-on-surface-secondary mb-1">Status</p>
             <p className="text-lg font-bold text-green-400">Active</p>
@@ -127,19 +127,20 @@ function About() {
               <div className="w-24 h-24 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
                 <span className="text-background text-4xl font-bold">💸</span>
               </div>
-              <h2 className="text-3xl font-bold text-on-surface mb-4">Welcome to KashMate</h2>
+                             <h2 className="text-3xl font-bold text-on-surface mb-4">Welcome to KashMate v1.1.0</h2>
               <p className="text-lg text-on-surface-secondary max-w-2xl mx-auto">
-                Your personal finance companion designed to help you track expenses, manage income, 
-                and gain insights into your spending patterns with beautiful visualizations and smart analytics.
+                Your intelligent finance companion with advanced filtering, transaction history, 
+                and dynamic summaries. Track expenses, manage income, and gain insights with 
+                beautiful visualizations and smart analytics.
               </p>
             </div>
 
             {/* Current Features */}
             <div className="bg-surface/80 backdrop-blur-sm rounded-2xl p-8 border border-surface/30">
-              <h3 className="text-2xl font-bold text-on-surface mb-6 flex items-center">
-                <span className="w-3 h-3 bg-blue-400 rounded-full mr-3"></span>
-                Current Features
-              </h3>
+                             <h3 className="text-2xl font-bold text-on-surface mb-6 flex items-center">
+                 <span className="w-3 h-3 bg-blue-400 rounded-full mr-3"></span>
+                 Version 1.1.0 Features
+               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
@@ -148,7 +149,54 @@ function About() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-on-surface">Smart Dashboard</h4>
-                      <p className="text-sm text-on-surface-secondary">Real-time overview of your financial status with interactive charts</p>
+                      <p className="text-sm text-on-surface-secondary">Real-time overview with transaction filtering and dynamic summaries</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-green-400 text-sm">📅</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-on-surface">Transaction History</h4>
+                      <p className="text-sm text-on-surface-secondary">Complete transaction history with date filtering and type-based filtering</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-purple-400 text-sm">🔍</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-on-surface">Advanced Filtering</h4>
+                      <p className="text-sm text-on-surface-secondary">Filter by transaction type (Income/Expense) and specific dates</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-yellow-400 text-sm">📈</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-on-surface">Dynamic Summaries</h4>
+                      <p className="text-sm text-on-surface-secondary">Real-time income, expense, and balance calculations based on filters</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-red-400 text-sm">🔐</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-on-surface">Password Recovery</h4>
+                      <p className="text-sm text-on-surface-secondary">Forgot password functionality with email-based reset system</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-indigo-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-indigo-400 text-sm">🎨</span>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-on-surface">Modern UI/UX</h4>
+                      <p className="text-sm text-on-surface-secondary">Fluid animations, micro-interactions, and responsive design</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
@@ -162,40 +210,11 @@ function About() {
                   </div>
                   <div className="flex items-start space-x-3">
                     <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <span className="text-purple-400 text-sm">📝</span>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-on-surface">Transaction Management</h4>
-                      <p className="text-sm text-on-surface-secondary">Add, edit, and delete transactions with full control</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <span className="text-yellow-400 text-sm">📈</span>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-on-surface">Visual Analytics</h4>
-                      <p className="text-sm text-on-surface-secondary">Beautiful pie charts for expense categories and payment methods</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <span className="text-red-400 text-sm">⚙️</span>
+                      <span className="text-purple-400 text-sm">⚙️</span>
                     </div>
                     <div>
                       <h4 className="font-semibold text-on-surface">Profile Management</h4>
-                      <p className="text-sm text-on-surface-secondary">Update your profile, email, and password securely</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="w-8 h-8 bg-indigo-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <span className="text-indigo-400 text-sm">🔒</span>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-on-surface">Secure Authentication</h4>
-                      <p className="text-sm text-on-surface-secondary">JWT-based authentication with encrypted password storage</p>
+                      <p className="text-sm text-on-surface-secondary">Update profile, email, and password with secure authentication</p>
                     </div>
                   </div>
                 </div>

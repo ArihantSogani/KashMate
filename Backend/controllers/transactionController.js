@@ -59,6 +59,57 @@ exports.getTransactions = async (req, res) => {
   }
 };
 
+// Get today's transactions for dashboard
+exports.getTodayTransactions = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const transactions = await Transaction.find({
+      userId,
+      date: {
+        $gte: today,
+        $lt: tomorrow
+      }
+    }).sort({ date: -1 });
+    
+    res.json(transactions);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch today\'s transactions', error });
+  }
+};
+
+// Get transactions by date range
+exports.getTransactionsByDate = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { startDate, endDate } = req.query;
+    
+    if (!startDate || !endDate) {
+      return res.status(400).json({ message: 'Start date and end date are required' });
+    }
+    
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999); // Include the entire end date
+    
+    const transactions = await Transaction.find({
+      userId,
+      date: {
+        $gte: start,
+        $lte: end
+      }
+    }).sort({ date: -1 });
+    
+    res.json(transactions);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch transactions by date', error });
+  }
+};
+
 // Delete a transaction
 exports.deleteTransaction = async (req, res) => {
   try {
