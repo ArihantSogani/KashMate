@@ -14,19 +14,37 @@ function Register() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    
     try {
       const response = await api.post('/api/auth/register', { name, email, password });
 
+      // Validate that we received a token
       const { token } = response.data;
+      if (!token) {
+        throw new Error('No authentication token received from server');
+      }
+      
+      // Store the token
       localStorage.setItem('token', token);
+      
+      // Navigate to dashboard
       navigate('/dashboard');
     } catch (err) {
       console.error('Registration error:', err);
-      if (err.response && err.response.data && err.response.data.message) {
-        setError(err.response.data.message);
+      
+      // Handle different types of errors
+      if (err.response) {
+        // Server responded with error status
+        const errorMessage = err.response.data?.message || 'Registration failed';
+        setError(errorMessage);
+      } else if (err.request) {
+        // Network error - no response received
+        setError('Network error. Please check your internet connection and try again.');
       } else if (err.message) {
+        // Other errors (like token validation)
         setError(`Registration failed: ${err.message}`);
       } else {
+        // Unknown error
         setError('Registration failed. Please try again.');
       }
     } finally {

@@ -13,18 +13,37 @@ function Login() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    
     try {
       const response = await api.post('/api/auth/login', { email, password });
+      
+      // Validate that we received a token
       const { token } = response.data;
+      if (!token) {
+        throw new Error('No authentication token received from server');
+      }
+      
+      // Store the token
       localStorage.setItem('token', token);
+      
+      // Navigate to dashboard
       navigate('/dashboard');
     } catch (err) {
       console.error('Login error:', err);
-      if (err.response && err.response.data && err.response.data.message) {
-        setError(err.response.data.message);
+      
+      // Handle different types of errors
+      if (err.response) {
+        // Server responded with error status
+        const errorMessage = err.response.data?.message || 'Login failed';
+        setError(errorMessage);
+      } else if (err.request) {
+        // Network error - no response received
+        setError('Network error. Please check your internet connection and try again.');
       } else if (err.message) {
+        // Other errors (like token validation)
         setError(`Login failed: ${err.message}`);
       } else {
+        // Unknown error
         setError('Login failed. Please try again.');
       }
     } finally {
