@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../config/axios';
 import TransactionRow from '../components/TransactionRow';
+import PortalDatePicker from '../components/PortalDatePicker';
 
 function MonthlyExpenses() {
   const navigate = useNavigate();
@@ -11,25 +12,12 @@ function MonthlyExpenses() {
   const [error, setError] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
   const [showAllTransactions, setShowAllTransactions] = useState(true);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+
   const [monthlySummary, setMonthlySummary] = useState({ income: 0, expense: 0 });
   const [transactionFilter, setTransactionFilter] = useState('all'); // 'all', 'income', 'expense'
   const token = localStorage.getItem('token');
 
-  // Close date picker when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (showDatePicker && !event.target.closest('.date-picker-container')) {
-        setShowDatePicker(false);
-      }
-    };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showDatePicker]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -90,7 +78,28 @@ function MonthlyExpenses() {
       return;
     }
 
-    // Create start and end of the selected date in local timezone
+    // Check if it's a range date (for Last 3 Months)
+    if (date.startsWith('range:')) {
+      const [startDate, endDate] = date.replace('range:', '').split(':');
+      
+      // Parse start and end dates
+      const [startYear, startMonth, startDay] = startDate.split('-').map(Number);
+      const [endYear, endMonth, endDay] = endDate.split('-').map(Number);
+      
+      const startOfRange = new Date(startYear, startMonth - 1, startDay, 0, 0, 0, 0);
+      const endOfRange = new Date(endYear, endMonth - 1, endDay, 23, 59, 59, 999);
+      
+      const dateFiltered = transactions.filter(tx => {
+        const txDate = new Date(tx.date);
+        return txDate >= startOfRange && txDate <= endOfRange;
+      });
+      
+      applyFilters(dateFiltered);
+      setShowAllTransactions(false);
+      return;
+    }
+
+    // Single date filtering (existing logic)
     const [year, month, day] = date.split('-').map(Number);
     const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
     const endOfDay = new Date(year, month - 1, day, 23, 59, 59, 999);
@@ -129,6 +138,13 @@ function MonthlyExpenses() {
 
   // Handle date selection
   const handleDateChange = (date) => {
+    // Check if it's already a formatted date string (for range dates)
+    if (typeof date === 'string' && date.startsWith('range:')) {
+      setSelectedDate(date);
+      filterByDate(date);
+      return;
+    }
+    
     // Create date in local timezone to avoid timezone issues
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -137,7 +153,6 @@ function MonthlyExpenses() {
     
     setSelectedDate(formattedDate);
     filterByDate(formattedDate);
-    setShowDatePicker(false);
   };
 
   // Clear date filter
@@ -147,59 +162,7 @@ function MonthlyExpenses() {
     setShowAllTransactions(true);
   };
 
-  // Get today's date
-  const getToday = () => {
-    const today = new Date();
-    handleDateChange(today);
-  };
 
-    // Generate calendar days
-  const generateCalendarDays = () => {
-    const currentYear = currentMonth.getFullYear();
-    const currentMonthIndex = currentMonth.getMonth();
-    
-    const firstDay = new Date(currentYear, currentMonthIndex, 1);
-    // const lastDay = new Date(currentYear, currentMonthIndex + 1, 0); // Unused variable
-    const startDate = new Date(firstDay);
-    startDate.setDate(startDate.getDate() - firstDay.getDay());
-    
-    const days = [];
-    const today = new Date();
-    
-    for (let i = 0; i < 42; i++) {
-      const date = new Date(startDate);
-      date.setDate(startDate.getDate() + i);
-      
-      const isCurrentMonth = date.getMonth() === currentMonthIndex;
-      const isToday = date.toDateString() === today.toDateString();
-      
-      // Create date string in local timezone for comparison
-      const dateYear = date.getFullYear();
-      const dateMonth = String(date.getMonth() + 1).padStart(2, '0');
-      const dateDay = String(date.getDate()).padStart(2, '0');
-      const dateString = `${dateYear}-${dateMonth}-${dateDay}`;
-      const isSelected = selectedDate && dateString === selectedDate;
-      
-      days.push({
-        date,
-        isCurrentMonth,
-        isToday,
-        isSelected
-      });
-    }
-    
-    return days;
-  };
-
-  // Navigate to previous month
-  const goToPreviousMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
-  };
-
-  // Navigate to next month
-  const goToNextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
-  };
 
   useEffect(() => {
     fetchTransactions();
@@ -315,102 +278,20 @@ function MonthlyExpenses() {
             </div>
             <div className="flex items-center space-x-4">
                              {/* Custom Date Filter */}
-               <div className="relative date-picker-container">
-            <div className="flex items-center space-x-2">
-                   <label className="text-sm text-on-surface-secondary">Filter by date:</label>
-                   <button
-                     onClick={() => setShowDatePicker(!showDatePicker)}
-                     className="px-4 py-2 bg-surface/50 border border-surface/30 rounded-lg text-on-surface hover:bg-surface/70 transition-colors flex items-center space-x-2"
-                   >
-                     <span>{selectedDate || 'Select Date'}</span>
-                     <span className="text-on-surface-secondary">📅</span>
-                   </button>
-                   {selectedDate && (
-                     <button
-                       onClick={clearDateFilter}
-                       className="px-3 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
-                     >
-                       Clear
-                     </button>
-                   )}
-                 </div>
-
-                                 {/* Custom Date Picker */}
-                 {showDatePicker && (
-                   <>
-                     {/* Backdrop */}
-                     <div className="fixed inset-0 bg-black/50 z-[9998]" onClick={() => setShowDatePicker(false)}></div>
-                     {/* Calendar */}
-                     <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-[9999]">
-                       <div className="bg-surface/95 backdrop-blur-md border border-surface/30 rounded-xl shadow-2xl p-4 w-80">
-                      {/* Calendar Header */}
-                      <div className="flex items-center justify-between mb-4">
-                        <button
-                          onClick={goToPreviousMonth}
-                          className="p-2 hover:bg-surface/50 rounded-lg transition-colors"
-                        >
-                          <span className="text-on-surface">‹</span>
-                        </button>
-                        <h3 className="text-lg font-semibold text-on-surface">
-                          {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                        </h3>
-                        <button
-                          onClick={goToNextMonth}
-                          className="p-2 hover:bg-surface/50 rounded-lg transition-colors"
-                        >
-                          <span className="text-on-surface">›</span>
-                        </button>
-                      </div>
-
-                      {/* Days of Week */}
-                      <div className="grid grid-cols-7 gap-1 mb-2">
-                        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-                          <div key={day} className="text-center text-xs text-on-surface-secondary py-2">
-                            {day}
-                          </div>
-                        ))}
-                      </div>
-
-                                             {/* Calendar Grid */}
-                       <div className="grid grid-cols-7 gap-1">
-                         {generateCalendarDays().map((day, index) => (
-                           <button
-                             key={index}
-                             onClick={() => day.isCurrentMonth && handleDateChange(day.date)}
-                             disabled={!day.isCurrentMonth}
-                             className={`
-                               p-1 text-xs rounded-lg transition-all duration-200 min-w-8 h-8 flex items-center justify-center
-                               ${!day.isCurrentMonth ? 'text-on-surface-secondary/30' : 'text-on-surface hover:bg-primary/20'}
-                               ${day.isToday ? 'bg-primary/30 text-primary font-semibold' : ''}
-                               ${day.isSelected ? 'bg-primary text-background font-semibold' : ''}
-                               ${day.isCurrentMonth && !day.isToday && !day.isSelected ? 'hover:bg-surface/50' : ''}
-                             `}
-                           >
-                             {day.date.getDate()}
-                           </button>
-                         ))}
-                       </div>
-
-                                             {/* Action Buttons */}
-                       <div className="flex justify-between mt-4 pt-4 border-t border-surface/30">
-                         <button
-                           onClick={clearDateFilter}
-                           className="px-4 py-2 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors"
-                         >
-                           Clear
-                         </button>
-                         <button
-                           onClick={getToday}
-                           className="px-4 py-2 bg-primary/20 text-primary hover:bg-primary/30 rounded-lg transition-colors"
-                         >
-                           Today
-                         </button>
-                       </div>
-                     </div>
-                   </div>
-                 </>
-                 )}
-              </div>
+               <div className="flex items-center space-x-3">
+                 <label className="text-sm text-on-surface-secondary">Filter by date:</label>
+                 <PortalDatePicker
+                   value={selectedDate}
+                   onChange={(date) => {
+                     if (date) {
+                       handleDateChange(new Date(date));
+                     } else {
+                       clearDateFilter();
+                     }
+                   }}
+                   placeholder="Select Date"
+                 />
+               </div>
             </div>
           </div>
         </div>

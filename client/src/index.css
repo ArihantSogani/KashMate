@@ -21,3 +21,28 @@
   scrollbar-width: thin;
   scrollbar-color: #2dd4bf #232B39;
 }
+
+/* Custom Date Picker Styles */
+.custom-date-picker {
+  z-index: 99999 !important;
+}
+
+.custom-date-picker .calendar-dropdown {
+  position: absolute !important;
+  z-index: 99999 !important;
+  isolation: isolate !important;
+}
+
+/* Simple Date Picker Styles */
+.simple-date-picker {
+  z-index: 99999 !important;
+  position: relative !important;
+}
+
+.simple-date-picker .dropdown {
+  position: absolute !important;
+  z-index: 99999 !important;
+  isolation: isolate !important;
+  transform: translateZ(0) !important;
+}
+
