@@ -33,6 +33,6 @@
     }
   ],
   "env": {
-    "REACT_APP_API_URL": "https://kashmate-backend.onrender.com"
+    "REACT_APP_API_URL": "https://kashmate.onrender.com"
   }
 } 
