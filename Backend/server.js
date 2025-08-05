@@ -11,13 +11,21 @@ app.use(cors({
     'http://localhost:3000',
     'https://kash-mate.vercel.app',
     'https://kashmate.vercel.app',
-    'https://kashmate-frontend.vercel.app'
+    'https://kashmate-frontend.vercel.app',
+    'https://money-manager-sandy.vercel.app',
+    // Allow all Vercel preview deployments
+    /https:\/\/.*\.vercel\.app$/,
+    // Allow all subdomains of vercel.app
+    /https:\/\/.*--.*\.vercel\.app$/
   ],
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 
 app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} - Origin: ${req.headers.origin}`);
   next();
 });
 
