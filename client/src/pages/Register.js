@@ -16,6 +16,9 @@ function Register() {
     setError('');
     
     try {
+      console.log('Attempting registration with API URL:', process.env.REACT_APP_API_URL);
+      console.log('Registration data:', { name, email, password: '***' });
+      
       const response = await api.post('/api/auth/register', { name, email, password });
 
       // Validate that we received a token
@@ -30,7 +33,13 @@ function Register() {
       // Navigate to dashboard
       navigate('/dashboard');
     } catch (err) {
-      console.error('Registration error:', err);
+      console.error('Registration error details:', {
+        message: err.message,
+        code: err.code,
+        response: err.response?.data,
+        status: err.response?.status,
+        config: err.config
+      });
       
       // Handle different types of errors
       if (err.response) {

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Backend Test</title>
+</head>
+<body>
+    <h1>Backend Connection Test</h1>
+    <button onclick="testBackend()">Test Backend</button>
+    <div id="result"></div>
+
+    <script>
+        async function testBackend() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('https://kashmate-backend.onrender.com/api/auth/me');
+                resultDiv.innerHTML = `✅ Backend is working! Status: ${response.status}`;
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Backend error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -10,7 +10,6 @@ app.use(cors({
   origin: [
     'http://localhost:3000',
     'https://kash-mate.vercel.app',
-    'https://money-manager-sandy.vercel.app',
     'https://kashmate.vercel.app',
     'https://kashmate-frontend.vercel.app'
   ],

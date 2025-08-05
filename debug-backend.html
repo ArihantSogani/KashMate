@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Backend Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        .result { margin-top: 10px; padding: 10px; background-color: #f8f9fa; border-radius: 3px; }
+        pre { background-color: #f1f1f1; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Backend Debug Test</h1>
+    
+    <div class="test-section">
+        <h3>1. Test Basic Backend Connection</h3>
+        <button onclick="testBasicConnection()">Test Basic Connection</button>
+        <div id="basicResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Test Registration Endpoint</h3>
+        <button onclick="testRegistration()">Test Registration</button>
+        <div id="registerResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Test Login Endpoint</h3>
+        <button onclick="testLogin()">Test Login</button>
+        <div id="loginResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. Environment Check</h3>
+        <button onclick="checkEnvironment()">Check Environment</button>
+        <div id="envResult" class="result"></div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'https://kashmate-backend.onrender.com';
+        
+        async function testBasicConnection() {
+            const resultDiv = document.getElementById('basicResult');
+            resultDiv.innerHTML = 'Testing basic connection...';
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/auth/me`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        ✅ Backend is accessible!<br>
+                        Status: ${response.status}<br>
+                        Response: <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        ❌ Backend connection failed:<br>
+                        Error: ${error.message}<br>
+                        Type: ${error.name}<br>
+                        Code: ${error.code || 'N/A'}
+                    </div>
+                `;
+            }
+        }
+
+        async function testRegistration() {
+            const resultDiv = document.getElementById('registerResult');
+            resultDiv.innerHTML = 'Testing registration...';
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'Test User',
+                        email: `test${Date.now()}@example.com`,
+                        password: 'testpassword123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            ✅ Registration successful!<br>
+                            Status: ${response.status}<br>
+                            Token: ${data.token ? 'Received' : 'Missing'}<br>
+                            Response: <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            ❌ Registration failed:<br>
+                            Status: ${response.status}<br>
+                            Error: ${data.message}<br>
+                            Response: <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        ❌ Network error:<br>
+                        Error: ${error.message}<br>
+                        Type: ${error.name}<br>
+                        Code: ${error.code || 'N/A'}
+                    </div>
+                `;
+            }
+        }
+
+        async function testLogin() {
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.innerHTML = 'Testing login...';
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'testpassword123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            ✅ Login successful!<br>
+                            Status: ${response.status}<br>
+                            Token: ${data.token ? 'Received' : 'Missing'}<br>
+                            Response: <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            ❌ Login failed:<br>
+                            Status: ${response.status}<br>
+                            Error: ${data.message}<br>
+                            Response: <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        ❌ Network error:<br>
+                        Error: ${error.message}<br>
+                        Type: ${error.name}<br>
+                        Code: ${error.code || 'N/A'}
+                    </div>
+                `;
+            }
+        }
+
+        function checkEnvironment() {
+            const resultDiv = document.getElementById('envResult');
+            
+            const envInfo = {
+                'Backend URL': BACKEND_URL,
+                'User Agent': navigator.userAgent,
+                'Current URL': window.location.href,
+                'Protocol': window.location.protocol,
+                'Host': window.location.host
+            };
+            
+            resultDiv.innerHTML = `
+                <div class="success">
+                    <h4>Environment Information:</h4>
+                    <pre>${JSON.stringify(envInfo, null, 2)}</pre>
+                </div>
+            `;
+        }
+
+        // Auto-run basic connection test
+        window.onload = testBasicConnection;
+    </script>
+</body>
+</html> 

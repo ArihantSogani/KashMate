@@ -15,6 +15,9 @@ function Login() {
     setError('');
     
     try {
+      console.log('Attempting login with API URL:', process.env.REACT_APP_API_URL);
+      console.log('Login data:', { email, password: '***' });
+      
       const response = await api.post('/api/auth/login', { email, password });
       
       // Validate that we received a token
@@ -29,7 +32,13 @@ function Login() {
       // Navigate to dashboard
       navigate('/dashboard');
     } catch (err) {
-      console.error('Login error:', err);
+      console.error('Login error details:', {
+        message: err.message,
+        code: err.code,
+        response: err.response?.data,
+        status: err.response?.status,
+        config: err.config
+      });
       
       // Handle different types of errors
       if (err.response) {
